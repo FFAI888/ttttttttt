@@ -1,8 +1,15 @@
 const app = document.getElementById("app");
-let userAccount = null; // 保存当前钱包地址
+const topBar = document.getElementById("top-bar");
+let userAccount = null;
+
+// 更新顶部钱包状态
+function updateTopBar() {
+  topBar.textContent = userAccount ? "钱包状态: " + userAccount : "钱包状态: 未连接";
+}
 
 // 页面渲染函数
 function renderLogin() {
+  updateTopBar();
   app.innerHTML = `
     <div class="page">
       <h1>欢迎登录</h1>
@@ -16,6 +23,7 @@ function renderLogin() {
       try {
         const accounts = await ethereum.request({ method: "eth_requestAccounts" });
         userAccount = accounts[0];
+        updateTopBar();
         document.getElementById("status").textContent = "钱包已连接: " + userAccount;
         setTimeout(() => renderConfirm(), 1000);
       } catch (err) {
@@ -28,6 +36,7 @@ function renderLogin() {
 }
 
 function renderConfirm() {
+  updateTopBar();
   app.innerHTML = `
     <div class="page">
       <h2>确认关系</h2>
@@ -42,30 +51,19 @@ function renderConfirm() {
   });
 }
 
-function renderHome() {
-  renderPage("首页", "欢迎来到应用！");
-}
-
-function renderGroup() {
-  renderPage("拼团页面", "这里是拼团功能。");
-}
-
-function renderEarn() {
-  renderPage("赚币页面", "这里是赚币功能。");
-}
-
-function renderExchange() {
-  renderPage("兑换页面", "这里是兑换功能。");
-}
+function renderHome() { renderPage("首页", "欢迎来到应用！"); }
+function renderGroup() { renderPage("拼团页面", "这里是拼团功能。"); }
+function renderEarn() { renderPage("赚币页面", "这里是赚币功能。"); }
+function renderExchange() { renderPage("兑换页面", "这里是兑换功能。"); }
 
 function renderMine() {
+  updateTopBar();
   app.innerHTML = `
     <div class="page">
       <h1>我的页面</h1>
       <p>这里是用户个人中心。</p>
       <div class="wallet-address">
-        <strong>钱包地址:</strong><br>
-        ${userAccount ? userAccount : "未连接"}
+        <strong>钱包地址:</strong><br>${userAccount ? userAccount : "未连接"}
       </div>
     </div>
 
@@ -77,13 +75,13 @@ function renderMine() {
       <a href="#" id="nav-mine">我的</a>
     </div>
   `;
-
   bindNavEvents();
   highlightNav("我的页面");
 }
 
 // 公共页面渲染模板
 function renderPage(title, content) {
+  updateTopBar();
   app.innerHTML = `
     <div class="page">
       <h1>${title}</h1>
@@ -98,12 +96,10 @@ function renderPage(title, content) {
       <a href="#" id="nav-mine">我的</a>
     </div>
   `;
-
   bindNavEvents();
   highlightNav(title);
 }
 
-// 绑定导航栏事件
 function bindNavEvents() {
   document.getElementById("nav-home").addEventListener("click", () => renderHome());
   document.getElementById("nav-group").addEventListener("click", () => renderGroup());
@@ -112,7 +108,6 @@ function bindNavEvents() {
   document.getElementById("nav-mine").addEventListener("click", () => renderMine());
 }
 
-// 高亮当前导航
 function highlightNav(current) {
   const mapping = {
     "首页": "nav-home",
@@ -122,9 +117,7 @@ function highlightNav(current) {
     "我的页面": "nav-mine",
   };
   const id = mapping[current];
-  if (id) {
-    document.getElementById(id).classList.add("active");
-  }
+  if (id) document.getElementById(id).classList.add("active");
 }
 
 // 初始渲染登录页
