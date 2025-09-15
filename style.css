@@ -1,29 +1,69 @@
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
   background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 顶部状态栏 */
+#top-bar {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  background: #4CAF50;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* 页面容器 */
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2vh 5%;
+  margin-top: 50px; /* 顶部状态栏高度 */
+  margin-bottom: 70px; /* 底部导航栏高度 */
+  max-width: 500px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* 页面文字间距 */
+.page h1, .page h2, .page p {
+  margin-bottom: 2vh;
 }
 
 /* 通用按钮 */
 button {
-  padding: 12px 20px;
-  font-size: 16px;
+  font-size: clamp(14px, 4vw, 18px);
+  padding: clamp(10px, 3vw, 16px) clamp(20px, 5vw, 24px);
+  min-width: 120px;
   background: #4CAF50;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 button:hover {
   background: #45a049;
-}
-
-/* 页面容器 */
-.page {
-  padding: 20px;
-  margin-bottom: 60px; /* 底部导航留空间 */
-  text-align: center;
 }
 
 /* 底部导航栏 */
@@ -32,17 +72,21 @@ button:hover {
   bottom: 0;
   left: 0;
   width: 100%;
+  height: 50px;
+  line-height: 50px;
   background: #fff;
   border-top: 1px solid #ddd;
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
+  padding: 0;
 }
 
 .bottom-nav a {
   text-decoration: none;
   color: #333;
   font-size: 14px;
+  flex: 1;
+  text-align: center;
 }
 
 .bottom-nav a.active {
@@ -52,7 +96,7 @@ button:hover {
 
 /* 钱包地址样式 */
 .wallet-address {
-  margin-top: 20px;
+  margin-top: 2vh;
   font-size: 14px;
   color: #555;
   word-break: break-all;
