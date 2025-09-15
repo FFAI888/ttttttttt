@@ -2,12 +2,15 @@ const app = document.getElementById("app");
 const topBar = document.getElementById("top-bar");
 let userAccount = null;
 
+// 模拟永久保存邀请人地址（真实场景应存到后端或智能合约）
+let inviterBinding = {}; // { "用户钱包地址": "邀请人钱包地址" }
+
 // 更新顶部钱包状态
 function updateTopBar() {
   topBar.textContent = userAccount ? "钱包状态: " + userAccount : "钱包状态: 未连接";
 }
 
-// 页面渲染函数
+// 登录页面
 function renderLogin() {
   updateTopBar();
   app.innerHTML = `
@@ -24,8 +27,15 @@ function renderLogin() {
         const accounts = await ethereum.request({ method: "eth_requestAccounts" });
         userAccount = accounts[0];
         updateTopBar();
-        document.getElementById("status").textContent = "钱包已连接: " + userAccount;
-        setTimeout(() => renderConfirm(), 1000);
+
+        // 检查钱包是否已绑定邀请人
+        if (!inviterBinding[userAccount]) {
+          document.getElementById("status").textContent = "钱包已连接，请绑定邀请人关系（注册）";
+          setTimeout(() => renderConfirm(), 1000);
+        } else {
+          document.getElementById("status").textContent = "钱包已连接，邀请人已绑定";
+          setTimeout(() => renderHome(), 1000);
+        }
       } catch (err) {
         document.getElementById("status").textContent = "连接失败: " + err.message;
       }
@@ -35,22 +45,31 @@ function renderLogin() {
   });
 }
 
+// 注册/确认关系页面
 function renderConfirm() {
   updateTopBar();
   app.innerHTML = `
     <div class="page">
-      <h2>确认关系</h2>
-      <p>请确认你要绑定的钱包关系。</p>
-      <button id="confirmBtn">确认</button>
+      <h2>绑定邀请人关系（注册）</h2>
+      <p>请输入邀请人钱包地址完成绑定：</p>
+      <input type="text" id="inviterInput" placeholder="邀请人钱包地址" style="width:80%;padding:8px;margin-bottom:15px;">
+      <button id="confirmBtn">确认绑定</button>
     </div>
   `;
 
   document.getElementById("confirmBtn").addEventListener("click", () => {
-    alert("关系已确认！");
-    renderHome();
+    const inviterAddr = document.getElementById("inviterInput").value.trim();
+    if (inviterAddr) {
+      inviterBinding[userAccount] = inviterAddr;
+      alert("绑定成功！");
+      renderHome();
+    } else {
+      alert("请输入邀请人钱包地址！");
+    }
   });
 }
 
+// 首页及其他页面
 function renderHome() { renderPage("首页", "欢迎来到应用！"); }
 function renderGroup() { renderPage("拼团页面", "这里是拼团功能。"); }
 function renderEarn() { renderPage("赚币页面", "这里是赚币功能。"); }
@@ -64,6 +83,9 @@ function renderMine() {
       <p>这里是用户个人中心。</p>
       <div class="wallet-address">
         <strong>钱包地址:</strong><br>${userAccount ? userAccount : "未连接"}
+      </div>
+      <div class="wallet-address">
+        <strong>邀请人钱包:</strong><br>${inviterBinding[userAccount] ? inviterBinding[userAccount] : "未绑定"}
       </div>
     </div>
 
@@ -79,7 +101,7 @@ function renderMine() {
   highlightNav("我的页面");
 }
 
-// 公共页面渲染模板
+// 公共页面模板
 function renderPage(title, content) {
   updateTopBar();
   app.innerHTML = `
@@ -100,6 +122,7 @@ function renderPage(title, content) {
   highlightNav(title);
 }
 
+// 导航栏事件
 function bindNavEvents() {
   document.getElementById("nav-home").addEventListener("click", () => renderHome());
   document.getElementById("nav-group").addEventListener("click", () => renderGroup());
