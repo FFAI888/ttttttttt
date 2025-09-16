@@ -17,6 +17,7 @@ function renderLogin() {
     <div class="page">
       <h1>欢迎登录</h1>
       <button id="connectWallet">连接钱包</button>
+      <input type="text" id="inviterDisplay" placeholder="邀请人地址" readonly>
       <p id="status"></p>
     </div>
   `;
@@ -28,8 +29,13 @@ function renderLogin() {
         userAccount = accounts[0];
         updateTopBar();
 
-        // 检查钱包是否已绑定邀请人
-        if (!inviterBinding[userAccount]) {
+        // 自动显示邀请人地址（只读）
+        const inviterAddr = inviterBinding[userAccount] || "";
+        const inviterInput = document.getElementById("inviterDisplay");
+        inviterInput.value = inviterAddr;
+
+        // 判断是否已有邀请人地址
+        if (!inviterAddr) {
           document.getElementById("status").textContent = "钱包已连接，请绑定邀请人关系（注册）";
           setTimeout(() => renderConfirm(), 1000);
         } else {
